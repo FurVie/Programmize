@@ -3,10 +3,10 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Login | Codify Admin</title>
+    <title>Login | Programmize</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="../../css/style.css">
+    <link rel="stylesheet" href="../../assets/css/style.css">
     <style>
         body {
             background: linear-gradient(135deg, #007bff, #6610f2);
@@ -35,14 +35,21 @@
     <h3><i class="fa fa-graduation-cap text-primary me-2"></i>Codify</h3>
     <form action="login" method="post">
         <div class="mb-3">
-            <label class="form-label">Username</label>
-            <input type="text" name="username" class="form-control" placeholder="Enter your username" required
-                   value="<%= request.getParameter("username") != null ? request.getParameter("username") : "" %>">
+            <label class="form-label">Username or Email</label>
+            <input type="text" name="userOrEmail" class="form-control" placeholder="Enter your username or email" required
+                   value="<%= request.getParameter("userOrEmail") != null ? request.getParameter("userOrEmail") : "" %>">
         </div>
+        <% if (request.getAttribute("userOrEmailError") != null) { %>
+        <div class="text-danger mb-3"><%= request.getAttribute("userOrEmailError") %></div>
+        <% } %>
         <div class="mb-3">
             <label class="form-label">Password</label>
             <input type="password" name="password" class="form-control" placeholder="Enter your password" required>
         </div>
+        <% if (request.getAttribute("passError") != null) { %>
+        <div class="text-danger mb-3"><%= request.getAttribute("passError") %></div>
+        <% } %>
+        <%--Chưa làm--%>
         <div class="d-flex justify-content-between align-items-center mb-3">
             <div>
                 <input type="checkbox" id="remember">
@@ -51,10 +58,6 @@
             <%--Chưa làm--%>
             <a href="#" class="text-decoration-none">Forgot password?</a>
         </div>
-
-        <% if (request.getAttribute("error") != null) { %>
-        <div class="text-danger mb-3"><%= request.getAttribute("error") %></div>
-        <% } %>
 
         <button type="submit" class="btn btn-primary w-100">Login</button>
     </form>

@@ -39,29 +39,48 @@
             <input type="text" name="fullname" class="form-control" placeholder="Enter your fullname" required
                    value="<%= request.getParameter("fullname") != null ? request.getParameter("fullname") : "" %>">
         </div>
+
+        <% if (request.getAttribute("fullnameError") != null) { %>
+        <div class="text-danger mb-3"><%= request.getAttribute("fullnameError") %></div>
+        <% } %>
+
         <div class="mb-3">
             <label class="form-label">Username</label>
             <input type="text" name="username" class="form-control" placeholder="Enter your username" required
                    value="<%= request.getParameter("username") != null ? request.getParameter("username") : "" %>">
         </div>
+
+        <% if (request.getAttribute("usernameError") != null) { %>
+        <div class="text-danger mb-3"><%= request.getAttribute("usernameError") %></div>
+        <% } %>
+
         <div class="mb-3">
             <label class="form-label">Email</label>
             <input type="email" name="email" class="form-control" placeholder="Enter your email" required
                    value="<%= request.getParameter("email") != null ? request.getParameter("email") : "" %>">
         </div>
-        <div class="mb-3">
-            <label class="form-label">Phone number</label>
-            <input type="text" name="mobile" class="form-control" placeholder="Enter your phone number" required
-                   value="<%= request.getParameter("mobile") != null ? request.getParameter("mobile") : "" %>">
-        </div>
+
+        <% if (request.getAttribute("emailError") != null) { %>
+        <div class="text-danger mb-3"><%= request.getAttribute("emailError") %></div>
+        <% } %>
+
         <div class="mb-3">
             <label class="form-label">Password</label>
             <input type="password" name="password" class="form-control" placeholder="Enter your password">
         </div>
+
+        <% if (request.getAttribute("passError") != null) { %>
+        <div class="text-danger mb-3"><%= request.getAttribute("passError") %></div>
+        <% } %>
+
         <div class="mb-3">
             <label class="form-label">Confirm Password</label>
             <input type="password" name="confirmPassword" class="form-control" placeholder="Re-enter your password">
         </div>
+
+        <% if (request.getAttribute("confirmPassError") != null) { %>
+        <div class="text-danger mb-3"><%= request.getAttribute("confirmPassError") %></div>
+        <% } %>
 
         <% if (request.getAttribute("error") != null) { %>
         <div class="text-danger mb-3"><%= request.getAttribute("error") %></div>

@@ -1,31 +1,27 @@
 package dao;
 
 import model.User;
-import utils.DBUtil;
 
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLIntegrityConstraintViolationException;
-import java.util.ArrayList;
-import java.util.List;
+import java.sql.*;
 
 import static utils.DBUtil.getConnection;
 
 public class UserDAO {
-    public User checkLogin(String username, String password) {
-        String sql = "SELECT * FROM users WHERE username=? AND password=?";
+    public User checkLogin(String userOrEmail, String password) {
+        String sql = "SELECT * FROM user WHERE (username = ? OR email = ?) AND password = ?";
         try (Connection conn = getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
-            stmt.setString(1, username);
-            stmt.setString(2, password);
-            ResultSet rs = stmt.executeQuery();
-
-            if (rs.next()) {
-                User user = new User();
-                user.setFullname(rs.getString("fullname"));
-                user.setEmail(rs.getString("email"));
-                return user;
+            stmt.setString(1, userOrEmail);
+            stmt.setString(2, userOrEmail);
+            stmt.setString(3, password);
+            try (ResultSet rs = stmt.executeQuery()) {
+                if (rs.next()) {
+                    User u = new User();
+                    u.setUsername(rs.getString("username"));
+                    u.setEmail(rs.getString("email"));
+                    u.setFullname(rs.getString("fullname"));
+                    return u;
+                }
             }
         } catch (Exception e) {
             e.printStackTrace();
@@ -33,13 +29,15 @@ public class UserDAO {
         return null;
     }
 
-    public boolean checkUsername(String username) {
-        String sql = "SELECT username FROM users WHERE username = ?";
+    public boolean checkUserOrEmailExists(String userOrEmail) {
+        String sql = "SELECT 1 FROM user WHERE username = ? OR email = ?";
         try (Connection conn = getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
-            stmt.setString(1, username);
-            ResultSet rs = stmt.executeQuery();
-            return rs.next();
+            stmt.setString(1, userOrEmail);
+            stmt.setString(2, userOrEmail);
+            try (ResultSet rs = stmt.executeQuery()) {
+                return rs.next();
+            }
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -47,21 +45,26 @@ public class UserDAO {
     }
 
     public boolean addUser(User user) {
-        String sql = "INSERT INTO users (fullname, username, email, mobile, password, role, create_at, create_by, update_at, update_by)"
-                + "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+        String sql = "INSERT INTO user (fullname, username, email, password, status)"
+                + "VALUES (?, ?, ?, ?, ?)";
         try (Connection conn = getConnection();
-             PreparedStatement stmt = conn.prepareStatement(sql)) {
+             PreparedStatement stmt = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
             stmt.setString(1, user.getFullname());
             stmt.setString(2, user.getUsername());
             stmt.setString(3, user.getEmail());
-            stmt.setString(4,user.getMobile());
-            stmt.setString(5, user.getPassword());
-            stmt.setString(6, user.getRole().name());
-            stmt.setTimestamp(7, user.getCreated_at());
-            stmt.setString(8, user.getCreate_by());
-            stmt.setTimestamp(9, user.getUpdated_at());
-            stmt.setString(10, user.getUpdate_by());
-            return stmt.executeUpdate() > 0;
+            stmt.setString(4, user.getPassword());
+            stmt.setBoolean(5, user.isStatus());
+
+            // Lấy ID
+            if (stmt.executeUpdate() > 0) {
+                try (ResultSet generatedKeys = stmt.getGeneratedKeys()) {
+                    if (generatedKeys.next()) {
+                        int generatedId = generatedKeys.getInt(1);
+                        user.setId(generatedId);
+                    }
+                }
+                return true;
+            }
         } catch (SQLIntegrityConstraintViolationException e) {
             return false;
         } catch (Exception e) {
@@ -70,25 +73,15 @@ public class UserDAO {
         return false;
     }
 
-    public List<User> getAllUsers() {
-        List<User> list = new ArrayList<>();
-        String sql = "SELECT * FROM users";
-
-        try (Connection conn = DBUtil.getConnection();
-             PreparedStatement stmt = conn.prepareStatement(sql);
-             ResultSet rs = stmt.executeQuery()) {
-
-            while (rs.next()) {
-                User user = new User();
-                user.setUsername(rs.getString("username"));
-                user.setEmail(rs.getString("email"));
-                user.setPassword(rs.getString("password"));
-                list.add(user);
-            }
-
+    public void updateStatusByEmail(String email) {
+        String sql = "UPDATE user SET status = true WHERE email = ?";
+        try (Connection conn = getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+            stmt.setString(1, email);
+            stmt.executeUpdate();
         } catch (Exception e) {
             e.printStackTrace();
         }
-        return list;
     }
+
 }

@@ -5,6 +5,8 @@ import dao.UserDAO;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.*;
 import jakarta.servlet.annotation.WebServlet;
+import model.User;
+
 import java.io.IOException;
 
 @WebServlet(name = "LoginServlet", urlPatterns = {"/login"})
@@ -19,23 +21,28 @@ public class LoginServlet extends HttpServlet {
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         request.setCharacterEncoding("UTF-8");
-        String username = request.getParameter("username");
+        String userOrEmail = request.getParameter("userOrEmail");
         String password = request.getParameter("password");
 
         UserDAO dao = new UserDAO();
-        if (dao.checkLogin(username, password) != null) {
+
+        if (!dao.checkUserOrEmailExists(userOrEmail)) {
+            request.setAttribute("userOrEmailError", "Username or email does not exist!");
+            request.getRequestDispatcher("/WEB-INF/views/login.jsp").forward(request, response);
+            return;
+        }
+
+        User user = dao.checkLogin(userOrEmail, password);
+
+        if (user != null) {
             HttpSession session = request.getSession();
-            session.setAttribute("fullname", dao.checkLogin(username, password).getFullname());
-            session.setAttribute("email", username);
-            response.sendRedirect("dashboard");
+            session.setAttribute("fullname", user.getFullname());
+            session.setAttribute("email", user.getEmail());
+            request.getRequestDispatcher("/WEB-INF/views/dashboard.jsp").forward(request, response);
+
         } else {
-            if(dao.checkUsername(username)){
-                request.setAttribute("error", "Wrong password!");
-                request.getRequestDispatcher("/WEB-INF/views/login.jsp").forward(request, response);
-            }else {
-                request.setAttribute("error", "Username does not exist!");
-                request.getRequestDispatcher("/WEB-INF/views/login.jsp").forward(request, response);
-            }
+            request.setAttribute("passError", "Wrong password!");
+            request.getRequestDispatcher("/WEB-INF/views/login.jsp").forward(request, response);
         }
     }
 }
