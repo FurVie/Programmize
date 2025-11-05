@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Register | Codify</title>
+    <title>Register | Programmize</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css" rel="stylesheet">
     <link rel="stylesheet" href="../../css/style.css">
@@ -32,7 +32,7 @@
 </head>
 <body>
 <div class="register-card">
-    <h3><i class="fa fa-user-plus text-primary me-2"></i>Create Account</h3>
+    <h3><i class="fa fa-user-plus text-primary me-2"></i>Register</h3>
     <form action="register" method="post">
         <div class="mb-3">
             <label class="form-label">Full Name</label>
@@ -66,7 +66,7 @@
 
         <div class="mb-3">
             <label class="form-label">Password</label>
-            <input type="password" name="password" class="form-control" placeholder="Enter your password">
+            <input type="password" id="password" name="password" class="form-control" placeholder="Enter your password" required>
         </div>
 
         <% if (request.getAttribute("passError") != null) { %>
@@ -75,12 +75,17 @@
 
         <div class="mb-3">
             <label class="form-label">Confirm Password</label>
-            <input type="password" name="confirmPassword" class="form-control" placeholder="Re-enter your password">
+            <input type="password" id="confirmPassword" name="confirmPassword" class="form-control" placeholder="Re-enter your password" required>
         </div>
-
         <% if (request.getAttribute("confirmPassError") != null) { %>
         <div class="text-danger mb-3"><%= request.getAttribute("confirmPassError") %></div>
         <% } %>
+
+        <div class="text-start mb-3">
+            <button type="button" class="btn btn-outline-secondary btn-sm" onclick="togglePasswords()">
+                <i id="eyeIcon" class="fa fa-eye"></i> Show Passwords
+            </button>
+        </div>
 
         <% if (request.getAttribute("error") != null) { %>
         <div class="text-danger mb-3"><%= request.getAttribute("error") %></div>
@@ -92,5 +97,26 @@
         <a href="login" class="text-primary text-decoration-none">Login</a>
     </p>
 </div>
+
+<script>
+    function togglePasswords() {
+        const password = document.getElementById("password");
+        const confirmPassword = document.getElementById("confirmPassword");
+        const eyeIcon = document.getElementById("eyeIcon");
+
+        if (password.type === "password") {
+            password.type = "text";
+            confirmPassword.type = "text";
+            eyeIcon.classList.remove("fa-eye-slash");
+            eyeIcon.classList.add("fa-eye");
+        }
+        else {
+            password.type = "password";
+            confirmPassword.type = "password";
+            eyeIcon.classList.remove("fa-eye");
+            eyeIcon.classList.add("fa-eye-slash");
+        }
+    }
+</script>
 </body>
 </html>

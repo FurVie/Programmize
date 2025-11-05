@@ -32,7 +32,7 @@
 </head>
 <body>
 <div class="login-card">
-    <h3><i class="fa fa-graduation-cap text-primary me-2"></i>Codify</h3>
+    <h3><i class="fa fa-graduation-cap text-primary me-2"></i>Programmize</h3>
     <form action="login" method="post">
         <div class="mb-3">
             <label class="form-label">Username or Email</label>
@@ -44,8 +44,17 @@
         <% } %>
         <div class="mb-3">
             <label class="form-label">Password</label>
-            <input type="password" name="password" class="form-control" placeholder="Enter your password" required>
+            <div class="d-flex align-items-center">
+                <input type="password" id="password" name="password"
+                       class="form-control me-2" placeholder="Enter your password" required>
+                <button type="button" class="btn btn-outline-secondary d-flex align-items-center justify-content-center"
+                        style="width: 45px; height: 38px;"
+                        onclick="togglePassword()">
+                    <i id="eyeIcon" class="fa fa-eye"></i>
+                </button>
+            </div>
         </div>
+
         <% if (request.getAttribute("passError") != null) { %>
         <div class="text-danger mb-3"><%= request.getAttribute("passError") %></div>
         <% } %>
@@ -65,5 +74,22 @@
         <a href="register" class="text-primary text-decoration-none">Register</a>
     </p>
 </div>
+
+<script>
+    function togglePassword() {
+        const passwordInput = document.getElementById("password");
+        const eyeIcon = document.getElementById("eyeIcon");
+
+        if (passwordInput.type === "password") {
+            passwordInput.type = "text";
+            eyeIcon.classList.remove("fa-eye-slash");
+            eyeIcon.classList.add("fa-eye");
+        } else {
+            passwordInput.type = "password";
+            eyeIcon.classList.remove("fa-eye");
+            eyeIcon.classList.add("fa-eye-slash");
+        }
+    }
+</script>
 </body>
 </html>
