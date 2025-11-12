@@ -3,10 +3,7 @@ package servlet;
 import dao.UserDAO;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
-import jakarta.servlet.http.HttpServlet;
-import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpServletResponse;
-import jakarta.servlet.http.HttpSession;
+import jakarta.servlet.http.*;
 import utils.EmailUtil;
 
 import java.io.IOException;
@@ -18,28 +15,51 @@ public class VerificationServlet extends HttpServlet {
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
 
-        // Gửi mã xác thực
-        String email = request.getParameter("email");
+        String step = request.getParameter("step");
+        HttpSession session = request.getSession();
 
+        // ====== XỬ LÝ RESEND CODE ======
+        if ("resend".equals(step)) {
+            String email = (String) session.getAttribute("verifyEmail");
+
+            if (email == null) {
+                response.sendRedirect("register");
+                return;
+            }
+
+            // Tạo mã ngẫu nhiên
+            String newCode = String.valueOf((int) (Math.random() * 900000) + 100000);
+            session.setAttribute("verifyCode", newCode);
+
+            try {
+                EmailUtil.sendEmail(email, "Your new verification code is: " + newCode);
+                request.setAttribute("message", "A new verification code has been sent to your email.");
+            } catch (Exception e) {
+                e.printStackTrace();
+                request.setAttribute("error", "Failed to resend verification code!");
+            }
+
+            request.getRequestDispatcher("/WEB-INF/views/verifyEmail.jsp").forward(request, response);
+            return;
+        }
+
+        // ====== LẦN ĐẦU GỬI MÃ SAU KHI ĐĂNG KÝ ======
+        String email = request.getParameter("email");
         if (email == null || email.isEmpty()) {
             response.sendRedirect("register");
             return;
         }
 
-        // Sinh mã ngẫu nhiên 6 chữ số
         String code = String.valueOf((int) (Math.random() * 900000) + 100000);
-
-        // Lưu vào session
-        HttpSession session = request.getSession();
         session.setAttribute("verifyEmail", email);
         session.setAttribute("verifyCode", code);
 
         try {
-            EmailUtil.sendEmail(email, "Verification code: " + code);
+            EmailUtil.sendEmail(email, "Your verification code is: " + code);
             request.getRequestDispatcher("/WEB-INF/views/verifyEmail.jsp").forward(request, response);
         } catch (Exception e) {
             e.printStackTrace();
-            request.setAttribute("error", "The verification email could not be sent. Please try again.");
+            request.setAttribute("error", "Could not send verification email. Please try again.");
             request.getRequestDispatcher("/WEB-INF/views/register.jsp").forward(request, response);
         }
     }
@@ -48,7 +68,6 @@ public class VerificationServlet extends HttpServlet {
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
 
-        // Xác thực mã
         String inputCode = request.getParameter("code");
         HttpSession session = request.getSession();
 
@@ -64,9 +83,8 @@ public class VerificationServlet extends HttpServlet {
 
             request.getRequestDispatcher("/WEB-INF/views/verifySuccess.jsp").forward(request, response);
         } else {
-            request.setAttribute("error", "Incorrect verification code, please try again!");
+            request.setAttribute("error", "Incorrect verification code!");
             request.getRequestDispatcher("/WEB-INF/views/verifyEmail.jsp").forward(request, response);
         }
     }
 }
-

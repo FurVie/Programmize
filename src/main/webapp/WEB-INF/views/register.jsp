@@ -32,7 +32,14 @@
 </head>
 <body>
 <div class="register-card">
-    <h3><i class="fa fa-user-plus text-primary me-2"></i>Register</h3>
+    <div class="text-center mb-4">
+        <div class="d-flex justify-content-center align-items-center">
+            <i class="fa-solid fa-code fa-2x text-primary me-2"></i>
+            <h3 class="mt-0 mb-0">Programmize</h3>
+        </div>
+        <h5 class="text-muted mt-2">Register</h5>
+    </div>
+
     <form action="register" method="post">
         <div class="mb-3">
             <label class="form-label">Full Name</label>
@@ -88,7 +95,7 @@
         </div>
 
         <% if (request.getAttribute("error") != null) { %>
-        <div class="text-danger mb-3"><%= request.getAttribute("error") %></div>
+        <div class="alert alert-danger"><%= request.getAttribute("error") %></div>
         <% } %>
 
         <button type="submit" class="btn btn-success w-100">Register</button>

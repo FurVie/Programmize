@@ -15,13 +15,15 @@
             justify-content: center;
             align-items: center;
         }
+
         .login-card {
             background: #fff;
             border-radius: 15px;
-            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
             width: 380px;
             padding: 30px;
         }
+
         .login-card h3 {
             font-weight: bold;
             text-align: center;
@@ -32,15 +34,25 @@
 </head>
 <body>
 <div class="login-card">
-    <h3><i class="fa fa-graduation-cap text-primary me-2"></i>Programmize</h3>
+    <div class="text-center mb-4">
+        <div class="d-flex justify-content-center align-items-center">
+            <i class="fa-solid fa-code fa-2x text-primary me-2"></i>
+            <h3 class="mt-0 mb-0">Programmize</h3>
+        </div>
+        <h5 class="text-muted mt-2">Login</h5>
+    </div>
+
+
     <form action="login" method="post">
         <div class="mb-3">
             <label class="form-label">Username or Email</label>
-            <input type="text" name="userOrEmail" class="form-control" placeholder="Enter your username or email" required
+            <input type="text" name="userOrEmail" class="form-control" placeholder="Enter your username or email"
+                   required
                    value="<%= request.getParameter("userOrEmail") != null ? request.getParameter("userOrEmail") : "" %>">
         </div>
         <% if (request.getAttribute("userOrEmailError") != null) { %>
-        <div class="text-danger mb-3"><%= request.getAttribute("userOrEmailError") %></div>
+        <div class="text-danger mb-3"><%= request.getAttribute("userOrEmailError") %>
+        </div>
         <% } %>
         <div class="mb-3">
             <label class="form-label">Password</label>
@@ -50,13 +62,14 @@
                 <button type="button" class="btn btn-outline-secondary d-flex align-items-center justify-content-center"
                         style="width: 45px; height: 38px;"
                         onclick="togglePassword()">
-                    <i id="eyeIcon" class="fa fa-eye"></i>
+                    <i id="eyeIcon" class="fa fa-eye-slash"></i>
                 </button>
             </div>
         </div>
 
         <% if (request.getAttribute("passError") != null) { %>
-        <div class="text-danger mb-3"><%= request.getAttribute("passError") %></div>
+        <div class="text-danger mb-3"><%= request.getAttribute("passError") %>
+        </div>
         <% } %>
         <%--Chưa làm--%>
         <div class="d-flex justify-content-between align-items-center mb-3">
@@ -64,9 +77,12 @@
                 <input type="checkbox" id="remember">
                 <label for="remember">Remember me</label>
             </div>
-            <%--Chưa làm--%>
-            <a href="#" class="text-decoration-none">Forgot password?</a>
+            <a href="forgot-password" class="text-decoration-none">Forgot password?</a>
         </div>
+
+        <% if (request.getAttribute("error") != null) { %>
+        <div class="alert alert-danger"><%= request.getAttribute("error") %></div>
+        <% } %>
 
         <button type="submit" class="btn btn-primary w-100">Login</button>
     </form>

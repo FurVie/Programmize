@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Email Verification | Programmize</title>
+    <title>Verify Code | Programmize</title>
 
     <!-- Bootstrap CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
@@ -57,14 +57,16 @@
 <div class="verify-card">
     <div class="text-center mb-4">
         <div class="d-flex justify-content-center align-items-center">
-            <i class="fa-solid fa-envelope-circle-check fa-2x text-primary me-2"></i>
+            <i class="fa-solid fa-code fa-2x text-primary me-2"></i>
             <h3 class="mt-0 mb-0">Programmize</h3>
         </div>
         <h5 class="text-muted mt-2">Verify Your Email</h5>
     </div>
     <p>We've sent a 6-digit verification code to your email.</p>
 
-    <form action="verify" method="post">
+    <form action="forgot-password" method="post">
+        <input type="hidden" name="step" value="verify">
+
         <div class="mb-3">
             <label class="form-label">Verification Code</label>
             <input type="text" name="code" class="form-control code-input"
@@ -90,8 +92,8 @@
     </form>
 
     <p class="text-center mb-2">
-        Didn’t receive the code?
-        <a href="verify?step=resend" class="text-primary text-decoration-none" id="resendLink">Resend</a>
+        Didn't receive the code?
+        <a href="forgot-password?step=resend" class="text-primary text-decoration-none" id="resendLink">Resend</a>
     </p>
 
     <div class="text-center mt-3">
@@ -108,16 +110,22 @@
     (function() {
         let timeLeft = 60;
         let timerInterval = null;
+
         const resendLink = document.getElementById('resendLink');
+
         if (!resendLink) return;
 
+        // Hàm bắt đầu countdown
         function startCountdown() {
             resendLink.classList.add('resend-disabled');
             timeLeft = 60;
+
+            // Update ngay lập tức
             resendLink.textContent = 'Resend in ' + timeLeft + 's';
 
             timerInterval = setInterval(function() {
                 timeLeft--;
+
                 if (timeLeft > 0) {
                     resendLink.textContent = 'Resend in ' + timeLeft + 's';
                 } else {
@@ -128,25 +136,26 @@
             }, 1000);
         }
 
+        // Chặn click khi disabled
         resendLink.addEventListener('click', function(e) {
             if (resendLink.classList.contains('resend-disabled')) {
                 e.preventDefault();
                 return false;
-            } else {
-                startCountdown();
             }
         });
 
         // Bắt đầu countdown khi trang load
         startCountdown();
 
-        // Tự động ẩn alert success
+        // Tự động xóa success alert
         const successAlert = document.getElementById('successAlert');
         if (successAlert) {
-            setTimeout(() => {
+            setTimeout(function() {
                 successAlert.style.transition = 'opacity 0.5s';
                 successAlert.style.opacity = '0';
-                setTimeout(() => successAlert.remove(), 500);
+                setTimeout(function() {
+                    successAlert.remove();
+                }, 500);
             }, 5000);
         }
     })();
