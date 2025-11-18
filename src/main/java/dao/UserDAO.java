@@ -4,7 +4,7 @@ import model.User;
 import org.mindrot.jbcrypt.BCrypt;
 
 import java.sql.*;
-
+//Kien added
 import static utils.DBUtil.getConnection;
 
 public class UserDAO {
