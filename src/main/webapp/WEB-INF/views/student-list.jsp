@@ -8,113 +8,206 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Student List</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet">
+
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css" rel="stylesheet">
+    <link href="../../assets/css/admin.css" rel="stylesheet">
+
     <style>
-        .table th, .table td { vertical-align: middle; }
-        .action-btn { display: flex; justify-content: center; gap: 6px; }
-        .main-container {
-            padding-top: 80px; /* adjust theo height navbar */
+        /* Cấu hình Content Shift (Đồng bộ với JS) */
+        #content {
+            margin-left: 260px; /* Vị trí mặc định khi Sidebar mở */
+            transition: margin-left 0.25s ease;
+            min-height: 100vh;
+            padding: 20px;
+        }
+        #content.expanded {
+            margin-left: 72px; /* Vị trí khi Sidebar đóng */
         }
 
+        /* Cấu hình Topbar Shift (Đồng bộ với JS) */
+        #topbar {
+            margin-left: 260px;
+            transition: margin-left 0.25s ease;
+            position: sticky;
+            top: 0;
+            z-index: 999;
+        }
+        #topbar.expanded {
+            margin-left: 72px;
+        }
+
+        /* Các style khác */
+        .table th, .table td { vertical-align: middle; }
+        .action-btn { display: flex; justify-content: center; gap: 6px; }
+        .btn-primary {
+            background-color: white;
+            border: 1px solid #0B5DD4;
+            color: #0B5DD4; /* Màu cho icon search */
+            transition: background-color 0.3s ease;
+        }
+        .btn-primary:hover {
+            background-color: #0B5DD4;
+            color: white;
+        }
     </style>
 </head>
 <body class="bg-light">
 
-<jsp:include page="include/homeBar.jsp" />
+<%@ include file="include/admin_sidebar.jsp" %>
+<%@ include file="include/admin_topbar.jsp" %>
 
-<div class="container main-container">
-    <h2 class="fw-bold mb-4 text-primary">🎓 Student List</h2>
+<div id="content" class="content-wrapper">
+    <div class="container-fluid">
 
-    <!-- Filter + Search -->
-    <div class="card mb-4 shadow-sm">
-        <div class="card-body">
-            <form class="row g-3 align-items-center" method="get" action="student-list">
-                <div class="col-md-2">
-                    <select name="status" class="form-select">
-                        <option value="">All Status</option>
-                        <option value="1" <%= "1".equals(request.getAttribute("status")) ? "selected" : "" %>>Active</option>
-                        <option value="0" <%= "0".equals(request.getAttribute("status")) ? "selected" : "" %>>Inactive</option>
-                    </select>
-                </div>
+        <h2 class="fw-bold mb-4 text-primary">🎓 Student List</h2>
 
-                <div class="col-md-2">
-                    <select name="class" class="form-select">
-                        <option value="">All Classes</option>
-                        <option value="Java A" <%= "Java A".equals(request.getAttribute("className")) ? "selected" : "" %>>Java A</option>
-                        <option value="Python B" <%= "Python B".equals(request.getAttribute("className")) ? "selected" : "" %>>Python B</option>
-                        <option value="UI/UX 01" <%= "UI/UX 01".equals(request.getAttribute("className")) ? "selected" : "" %>>UI/UX 01</option>
-                    </select>
-                </div>
-
-                <div class="col-md-4 d-flex">
-                    <input type="text" name="search" class="form-control me-2"
-                           placeholder="Search by name or email..."
-                           value="<%= request.getAttribute("search") != null ? request.getAttribute("search") : "" %>">
-                    <button type="submit" class="btn btn-secondary"><i class="bi bi-search"></i></button>
-                </div>
-            </form>
+        <%
+            // Hiển thị thông báo hành động
+            String actionMessage = (String) request.getAttribute("actionMessage");
+            if (actionMessage != null && !actionMessage.isEmpty()) {
+        %>
+        <div class="alert alert-success alert-dismissible fade show" role="alert">
+            <%= actionMessage %>
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
         </div>
-    </div>
+        <%
+            }
+            List<String> classNamesList = (List<String>) request.getAttribute("classNamesList");
+            String selectedClass = (String) request.getAttribute("className");
+        %>
 
-    <!-- Student Table -->
-    <div class="card shadow-sm">
-        <div class="card-body">
-            <div class="table-responsive">
-                <table class="table table-bordered align-middle">
-                    <thead class="table-light">
-                    <tr>
-                        <th>#</th>
-                        <th>Full Name</th>
-                        <th>Email</th>
-                        <th>Class</th>
-                        <th>Status</th>
-                        <th class="text-center">Actions</th>
-                    </tr>
-                    </thead>
-                    <tbody>
-                    <%
-                        List<Student> students = (List<Student>) request.getAttribute("students");
-                        if (students != null && !students.isEmpty()) {
-                            int i = 1;
-                            for (Student st : students) {
-                    %>
-                    <tr>
-                        <td><%= i++ %></td>
-                        <td><%= st.getFullname() %></td>
-                        <td><%= st.getEmail() %></td>
-                        <td><%= st.getClassName() != null ? st.getClassName() : "-" %></td>
-                        <td>
-                            <% if (st.isStatus()) { %>
-                            <span class="badge bg-success">Active</span>
-                            <% } else { %>
-                            <span class="badge bg-danger">Inactive</span>
+        <div class="card mb-4 shadow-sm">
+            <div class="card-body">
+                <form class="row g-3 align-items-center" method="get" action="student-list">
+                    <div class="col-md-2">
+                        <select name="status" class="form-select">
+                            <option value="">All Status</option>
+                            <option value="1" <%= "1".equals(request.getAttribute("status")) ? "selected" : "" %>>Active</option>
+                            <option value="0" <%= "0".equals(request.getAttribute("status")) ? "selected" : "" %>>Inactive</option>
+                        </select>
+                    </div>
+
+                    <div class="col-md-3">
+                        <select name="class" class="form-select">
+                            <option value="">All Classes</option>
+                            <%
+                                if (classNamesList != null && !classNamesList.isEmpty()) {
+                                    for (String name : classNamesList) {
+                                        String selected = name.equals(selectedClass) ? "selected" : "";
+                            %>
+                            <option value="<%= name %>" <%= selected %>><%= name %></option>
+                            <%      }
+                            } else { %>
+                            <option value="" disabled>No classes found</option>
                             <% } %>
-                        </td>
-                        <td class="text-center">
-                            <div class="action-btn">
-                                <a href="student-detail?id=<%= st.getId() %>" class="btn btn-sm btn-outline-primary">
-                                    <i class="bi bi-pencil"></i>
-                                </a>
-                            </div>
-                        </td>
-                    </tr>
-                    <%
-                        }
-                    } else {
-                    %>
-                    <tr>
-                        <td colspan="6" class="text-center text-muted">No students found</td>
-                    </tr>
-                    <%
-                        }
-                    %>
-                    </tbody>
-                </table>
+                        </select>
+                    </div>
+
+                    <div class="col-md-4 d-flex">
+                        <input type="text" name="search" class="form-control me-2"
+                               placeholder="Search by name or email..."
+                               value="<%= request.getAttribute("search") != null ? request.getAttribute("search") : "" %>">
+                        <button type="submit" class="btn btn-primary">
+                            <i class="fas fa-search"></i>
+                        </button>
+                    </div>
+
+                    <div class="col-md-3 d-flex justify-content-end">
+                        <a href="add-student" class="btn btn-success">
+                            <i class="fas fa-user-plus"></i> Add Student
+                        </a>
+                    </div>
+                </form>
             </div>
         </div>
+
+        <div class="card shadow-sm">
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table table-bordered align-middle">
+                        <thead class="table-light">
+                        <tr>
+                            <th>#</th>
+                            <th>Full Name</th>
+                            <th>Email</th>
+                            <th>Class</th>
+                            <th>Status</th>
+                            <th class="text-center">Actions</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        <%
+                            List<Student> students = (List<Student>) request.getAttribute("students");
+                            if (students != null && !students.isEmpty()) {
+                                int i = 1;
+                                for (Student st : students) {
+                        %>
+                        <tr>
+                            <td><%= i++ %></td>
+                            <td><%= st.getFullname() %></td>
+                            <td><%= st.getEmail() %></td>
+                            <td><%= st.getClassName() != null ? st.getClassName() : "-" %></td>
+                            <td>
+                                <% if (st.isStatus()) { %>
+                                <span class="badge bg-success">Active</span>
+                                <% } else { %>
+                                <span class="badge bg-danger">Inactive</span>
+                                <% } %>
+                            </td>
+                            <td class="text-center">
+                                <div class="action-btn">
+                                    <a href="student-detail?id=<%= st.getId() %>"
+                                       class="btn btn-sm btn-outline-primary"
+                                       title="Detail">
+                                        <i class="fas fa-pencil-alt"></i>
+                                    </a>
+
+                                    <%
+                                        // Toggle Status Button
+                                        if (st.isStatus()) {
+                                    %>
+                                    <a href="student-list?action=toggleStatus&id=<%= st.getId() %>&newStatus=0"
+                                       class="btn btn-sm btn-outline-danger"
+                                       title="Set Inactive"
+                                       onclick="return confirm('Bạn có chắc muốn tắt trạng thái hoạt động của sinh viên <%= st.getFullname() %>?');">
+                                        <i class="fas fa-times-circle"></i>
+                                    </a>
+                                    <%
+                                    } else {
+                                    %>
+                                    <a href="student-list?action=toggleStatus&id=<%= st.getId() %>&newStatus=1"
+                                       class="btn btn-sm btn-outline-success"
+                                       title="Set Active"
+                                       onclick="return confirm('Bạn có chắc muốn kích hoạt trạng thái cho sinh viên <%= st.getFullname() %>?');">
+                                        <i class="fas fa-check-circle"></i>
+                                    </a>
+                                    <%
+                                        }
+                                    %>
+                                </div>
+                            </td>
+                        </tr>
+                        <%
+                            }
+                        } else {
+                        %>
+                        <tr>
+                            <td colspan="6" class="text-center text-muted">No students found</td>
+                        </tr>
+                        <%
+                            }
+                        %>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
     </div>
 </div>
 
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+<script src="../../assets/js/admin_scripts.js"></script>
 </body>
 </html>

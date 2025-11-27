@@ -1,4 +1,3 @@
-
 <nav class="navbar navbar-light bg-white shadow-sm px-4 topbar" id="topbar">
 
     <form class="d-none d-md-flex me-auto">

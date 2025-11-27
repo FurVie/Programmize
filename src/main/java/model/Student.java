@@ -6,6 +6,8 @@ public class Student {
     private String email;
     private boolean status;
     private String className;
+    private String username;
+    private String avatarUrl;
 
     public int getId() {
         return id;
@@ -45,5 +47,21 @@ public class Student {
 
     public void setClassName(String className) {
         this.className = className;
+    }
+
+    public String getUsername() {
+        return username;
+    }
+
+    public void setUsername(String username) {
+        this.username = username;
+    }
+
+    public String getAvatarUrl() {
+        return avatarUrl;
+    }
+
+    public void setAvatarUrl(String avatarUrl) {
+        this.avatarUrl = avatarUrl;
     }
 }
