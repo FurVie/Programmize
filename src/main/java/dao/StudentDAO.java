@@ -15,18 +15,16 @@ public class StudentDAO {
     public List<Student> searchStudents(String keyword, String status, String className) {
         List<Student> list = new ArrayList<>();
 
-        // SỬA ĐỔI: JOIN với user_role và setting để lọc theo tên role là 'Student'
         StringBuilder sql = new StringBuilder(
                 "SELECT u.user_id, u.fullname, u.email, u.status, c.class_name " +
                         "FROM user u " +
-                        "JOIN user_role ur ON u.user_id = ur.user_id " + // Bắt buộc phải có role
-                        "JOIN setting s ON ur.role_id = s.setting_id " + // Lấy tên role
+                        "JOIN user_role ur ON u.user_id = ur.user_id " +
+                        "JOIN setting s ON ur.role_id = s.setting_id " +
                         "LEFT JOIN class_user cu ON u.user_id = cu.user_id " +
                         "LEFT JOIN `class` c ON cu.class_id = c.class_id " +
-                        "WHERE s.setting_name = 'Student' " // Lấy động theo tên role
+                        "WHERE s.setting_name = 'Student' "
         );
 
-        // Áp dụng bộ lọc với PreparedStatement để tránh SQL Injection
         if (status != null && !status.isEmpty()) {
             sql.append(" AND u.status = ?");
         }
@@ -39,7 +37,7 @@ public class StudentDAO {
             sql.append(" AND (u.fullname LIKE ? OR u.email LIKE ?)");
         }
 
-        sql.append(" ORDER BY u.fullname ASC"); // Thêm sắp xếp mặc định
+        sql.append(" ORDER BY u.fullname ASC");
 
         try (Connection conn = DBUtil.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql.toString())) {
@@ -47,7 +45,6 @@ public class StudentDAO {
             int index = 1;
 
             if (status != null && !status.isEmpty()) {
-                // Giả định status được truyền là "0" hoặc "1"
                 ps.setInt(index++, Integer.parseInt(status));
             }
             if (className != null && !className.isEmpty()) {
@@ -196,7 +193,6 @@ public class StudentDAO {
                 student.setClassName(rs.getString("class_names")); // Chứa danh sách lớp, hoặc NULL
 
                 // Bổ sung các thông tin chi tiết khác từ bảng user
-                // (Giả định bạn muốn hiển thị username và avatar_url)
                 student.setUsername(rs.getString("username"));
                 student.setAvatarUrl(rs.getString("avatar_url"));
             }
@@ -208,12 +204,6 @@ public class StudentDAO {
         return student;
     }
 
-    /**
-     * Cập nhật trạng thái (Active/Inactive) của sinh viên.
-     * @param userId ID của người dùng (sinh viên)
-     * @param newStatus Trạng thái mới (true: Active, false: Inactive)
-     * @return true nếu cập nhật thành công, false nếu ngược lại.
-     */
     public boolean updateStudentStatus(int userId, boolean newStatus) {
         String sql = "UPDATE user SET status = ? WHERE user_id = ?";
 
@@ -232,15 +222,6 @@ public class StudentDAO {
         }
     }
 
-    // File: StudentDAO.java (Bổ sung thêm phương thức này)
-
-// ... (các imports và phương thức khác)
-
-    /**
-     * Lấy tên đầy đủ của người dùng dựa trên ID.
-     * @param userId ID của người dùng.
-     * @return Fullname của người dùng, hoặc null nếu không tìm thấy.
-     */
     public String getFullnameById(int userId) {
         String fullname = null;
         String sql = "SELECT fullname FROM user WHERE user_id = ?";
