@@ -1,11 +1,10 @@
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <!DOCTYPE html>
 <html>
-
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Programmize</title>
+    <title>Programmize - Dashboard</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
     <style>
         body {
@@ -250,16 +249,19 @@
         }
     </style>
 </head>
-
 <body>
-
 <!-- Include Header -->
-<jsp:include page="../views/include/header.jsp" />
+<%
+    // TEMPORARY: This line simulates a logged-in user
+    session.setAttribute("username","");
+%>
 <%@ page session="true" %>
+<jsp:include page="../views/include/header.jsp" />
+
 <main>
+    <!-- Courses Section -->
     <section class="courses-section">
         <div class="container">
-
             <h1 class="section-title">Highlighted Courses</h1>
 
             <div class="courses-grid">
@@ -278,14 +280,10 @@
                 </div>
             </div>
         </div>
-
-        </div>
     </section>
 </main>
-
 <!-- Footer -->
 <jsp:include page="../views/include/footer.jsp" />
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
-
 </body>
 </html>

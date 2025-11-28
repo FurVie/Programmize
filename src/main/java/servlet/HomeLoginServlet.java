@@ -7,11 +7,11 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
 
-@WebServlet("/home")
-public class HomeServlet extends HttpServlet {
+@WebServlet("/home-login")
+public class HomeLoginServlet extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-        req.getRequestDispatcher("/WEB-INF/views/home.jsp").forward(req, resp);
+        req.getRequestDispatcher("/WEB-INF/views/home-login.jsp").forward(req, resp);
 
     }
 }
