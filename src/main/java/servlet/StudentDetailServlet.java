@@ -1,0 +1,63 @@
+package servlet;
+
+import dao.StudentDAO;
+import model.Student;
+
+import jakarta.servlet.ServletException;
+import jakarta.servlet.annotation.WebServlet;
+import jakarta.servlet.http.HttpServlet;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
+
+import java.io.IOException;
+
+@WebServlet("/student-detail")
+public class StudentDetailServlet extends HttpServlet {
+
+    private StudentDAO studentDAO;
+
+    @Override
+    public void init() {
+        studentDAO = new StudentDAO();
+    }
+
+    @Override
+    protected void doGet(HttpServletRequest request, HttpServletResponse response)
+            throws ServletException, IOException {
+
+        String idParam = request.getParameter("id");
+        int studentId = -1;
+
+        try {
+            if (idParam != null) {
+                studentId = Integer.parseInt(idParam);
+            }
+        } catch (NumberFormatException e) {
+            // Xử lý lỗi ID không hợp lệ
+            response.sendError(HttpServletResponse.SC_BAD_REQUEST, "Invalid Student ID format.");
+            return;
+        }
+
+        if (studentId > 0) {
+            Student student = studentDAO.getStudentById(studentId);
+
+            if (student != null) {
+                request.setAttribute("student", student);
+                request.getRequestDispatcher("/WEB-INF/views/student-detail.jsp").forward(request, response);
+            } else {
+                // Không tìm thấy sinh viên
+                response.sendError(HttpServletResponse.SC_NOT_FOUND, "Student not found.");
+            }
+        } else {
+            // Không có ID được cung cấp
+            response.sendRedirect(request.getContextPath() + "/student-list");
+        }
+    }
+
+    @Override
+    protected void doPost(HttpServletRequest request, HttpServletResponse response)
+            throws ServletException, IOException {
+        // Có thể thêm logic xử lý update thông tin sinh viên tại đây
+        doGet(request, response);
+    }
+}
